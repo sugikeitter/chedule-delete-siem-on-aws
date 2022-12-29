@@ -1,0 +1,28 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  schedule-delete-siem-on-aws
+
+Resources:
+  ScheduledDeleteIndices:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      CodeUri: functions/deleteIndices
+      Handler: app.handler
+      MemorySize: 512 # You can change this setting
+      Timeout: 180 # You can change this setting
+      Role: <YOUR_SIEM_UPDATE_ROLE> # TODO Set your value
+      Environment:
+        Variables:
+          RETENTION_DAYS: 7 # You can change this setting
+          AOS_HOSTNAME: <TARGET_HOSTNAME> # TODO Set your value
+      Events:
+        Schedule:
+          Type: Schedule
+          Properties:
+            Description: Schedule to run the stock trading state machine every 12 hour
+            Enabled: True
+            Schedule: "rate(12 hour)" # You can change this setting
