@@ -33,10 +33,10 @@ def handler(event, context):
     if yyyy_mm in index_name:
       index_names.append(index_name)
   # XX 日前の YYYY-MM-DD を抜き出して、log-aws-***-YYYY-MM を bulk で削除
-  print('=== cat.indices:')
+  print('=== GET _cat/indices/ ===')
   print(index_names) # DEBUG
   for index_name in index_names:
-    print('=== delete_by_query:' + index_name) # DEBUG
+    print('=== POST ' + index_name + '/_delete_by_query ===') # DEBUG
     res = aos_client.delete_by_query(
       index=index_name,
       body={
