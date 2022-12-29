@@ -25,4 +25,4 @@ Resources:
           Properties:
             Description: Schedule to run the stock trading state machine every 12 hour
             Enabled: True
-            Schedule: "rate(12 hour)" # You can change this setting
+            Schedule: "rate(12 hours)" # You can change this setting
