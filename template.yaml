@@ -14,7 +14,7 @@ Resources:
       Handler: app.handler
       MemorySize: 512 # You can change this setting
       Timeout: 180 # You can change this setting
-      Role: <YOUR_SIEM_OPERATE_ROLE_ARN> # Set your value if you use existing role
+      Role: <YOUR_SIEM_OPERATE_ROLE_ARN> # TODO Set your value
       Environment:
         Variables:
           RETENTION_DAYS: 7 # You can change this setting
