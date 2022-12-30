@@ -8,6 +8,7 @@ AOS_HOSTNAME = os.getenv('AOS_HOSTNAME')
 # Delete logs XX days old.
 DAYS = int(os.getenv('RETENTION_DAYS'))
 
+
 def handler(event, context):
   # Create OpenSearch client
   awsauth = create_awsauth(AOS_HOSTNAME)
@@ -51,6 +52,7 @@ def handler(event, context):
     )
     print(res) # DEBUG
 
+    
 def create_awsauth(aos_hostname):
   aos_region = aos_hostname.split('.')[1]
   credentials = boto3.Session().get_credentials()
