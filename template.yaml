@@ -14,14 +14,19 @@ Resources:
       Handler: app.handler
       MemorySize: 512 # You can change this setting
       Timeout: 180 # You can change this setting
-      # Role: <YOUR_SIEM_UPDATE_ROLE> # If you use existing role, comment out this line and set <YOUR_SIEM_UPDATE_ROLE> and remove Policies section.
-      Policies: # If you use existing role, remove this Policies section.
-        - Statement:
-          - Sid: "OperateIndices"
-            Effect: "Allow"
-            Action:
-              - "es:ESHttp*"
-            Resource: "arn:aws:es:*:*:domain/aes-siem/*"  # You can change this setting
+      Role: <YOUR_SIEM_OPERATE_ROLE_ARN> # Set your value if you use existing role
+#       Policies: # If you don't use existing role, remove Role section and Comment out this Policies section.
+#         - Statement:
+#           - Sid: "OperateIndices"
+#             Effect: "Allow"
+#             Action:
+#               - "es:ESHttp*"
+#             Resource: "arn:aws:es:*:*:domain/aes-siem/*"  # You can change this setting
+#           - Sid: "DecryptKMS"
+#             Effect: "Allow"
+#             Action:
+#               - "kms:Decrypt"
+#             Resource: "arn:aws:kms:ap-northeast-1:123456789012:key/xxxxxxx-xxxx-xxxx-xxxx"  # You can change this setting
       Environment:
         Variables:
           RETENTION_DAYS: 7 # You can change this setting
