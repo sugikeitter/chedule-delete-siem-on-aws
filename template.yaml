@@ -14,7 +14,14 @@ Resources:
       Handler: app.handler
       MemorySize: 512 # You can change this setting
       Timeout: 180 # You can change this setting
-      Role: <YOUR_SIEM_UPDATE_ROLE> # TODO Set your value
+      # Role: <YOUR_SIEM_UPDATE_ROLE> # If you use existing role, comment out this line and set <YOUR_SIEM_UPDATE_ROLE>
+      Policies: # If you use existing role, remove Policies section
+        - Statement:
+          - Sid: "OperateIndices"
+            Effect: "Allow"
+            Action:
+              - "es:ESHttp*"
+            Resource: "arn:aws:es:*:*:domain/aes-siem/*"  # You can change this setting
       Environment:
         Variables:
           RETENTION_DAYS: 7 # You can change this setting
