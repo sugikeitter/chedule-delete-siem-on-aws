@@ -13,8 +13,8 @@ vim template.yaml
 
 | REPLACE | Note | Example |
 |---|---|---|
+| `<YOUR_SIEM_OPERATE_ROLE_ARN>` | Your `siem-LambdaEsLoaderServiceRole` or your custome role. | `arn:aws:iam::123456789012:role/siem-LambdaEsLoaderServiceRoleXXXXXXX` |
 | `<TARGET_HOSTNAME>` | Your OpenSearch host name | `xxxxxx.ap-northeast-1.es.amazonaws.com` |
-
 
 ## Build & Deploy
 ```bash
