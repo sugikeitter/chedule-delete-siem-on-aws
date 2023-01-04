@@ -27,7 +27,7 @@ def handler(event, context):
   indices = aos_client.cat.indices()
   index_names = []
   for i in indices.split("\n"):
-    i_list = i.split(" ")
+    i_list = i.split()
     if len(i_list) <= 2:
       break
     index_name = i_list[2]
