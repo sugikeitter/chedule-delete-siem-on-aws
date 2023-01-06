@@ -15,7 +15,7 @@ def handler(event, context):
   aos_client = create_aos_client(awsauth, AOS_HOSTNAME)
   # YYYY-MM-DD, XX days ago.
   dt_now = datetime.datetime.now()
-  dt_before = datetime.timedelta(days=DAYS)
+  dt_before = datetime.timedelta(days=DAYS + 1)
   dt = dt_now - dt_before
   yyyy_mm = dt.strftime('%Y-%m')
   yyyy_mm_dd = dt.strftime('%Y-%m-%d')
@@ -44,7 +44,7 @@ def handler(event, context):
         "query": {
           "range": {
             "eventTime": {
-              "lte": yyyy_mm_dd + "T00:00:00Z"
+              "lte": yyyy_mm_dd + "T23:59:59Z"
             }
           }
         }
