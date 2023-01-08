@@ -141,7 +141,7 @@ def delete_by_query(aos_client, index_name, yyyy_mm_dd):
 
 def delete(aos_client, index_name):
   print('=== POST ' + index_name + '/_delete_by_query ===') # DEBUG
-  res = aos_client.delete_by_query(
+  res = aos_client.delete(
     index=index_name
   )
   print(res) # DEBUG
