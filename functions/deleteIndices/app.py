@@ -6,7 +6,7 @@ from opensearchpy import AWSV4SignerAuth, OpenSearch, RequestsHttpConnection
 
 AOS_HOSTNAME = os.getenv('AOS_HOSTNAME')
 # Delete logs XX days old.
-DAYS = int(os.getenv('RETENTION_DAYS'))
+RETENTION_DAYS = int(os.getenv('RETENTION_DAYS'))
 INCLUDE_LIST = []
 if os.getenv('INCLUDE_LIST'):
   INCLUDE_LIST =[l.strip() for l in str(os.getenv('INCLUDE_LIST')).split(',')]
@@ -27,12 +27,14 @@ def handler(event, context):
   aos_client = create_aos_client(awsauth, AOS_HOSTNAME)
   # YYYY-MM-DD, XX days ago.
   dt_now = datetime.datetime.now()
-  dt_before = datetime.timedelta(days=DAYS + 1)
-  dt = dt_now - dt_before
+  print('Today: ' + dt_now.strftime('%Y-%m-%d'))
+  print('Retention days: ' + str(RETENTION_DAYS))
+  dt_target = datetime.timedelta(days=RETENTION_DAYS + 1)
+  dt = dt_now - dt_target
   yyyy_mm = dt.strftime('%Y-%m')
+  print('Delete target month: ' + yyyy_mm) # DEBUG
   yyyy_mm_dd = dt.strftime('%Y-%m-%d')
-  print(yyyy_mm) # DEBUG
-  print(yyyy_mm_dd) # DEBUG
+  print('Delete target day: ' + yyyy_mm_dd) # DEBUG
 
   # GET /_cat/indices で YYYY-MM が XX 日前のものを抜き出して index_names へ
   #  ex) ["log-aws-aaa-YYYY-MM", "log-aws-bbb-YYYY-MM", "log-aws-ccc-YYYY-MM"]
@@ -59,7 +61,27 @@ def handler(event, context):
       continue
     delete_by_query(aos_client, index_name, yyyy_mm_dd)
 
-    
+  # 削除対象の月より前の月のインデックスを削除したい場合
+  if os.getenv('DELETE_BEFORE_TARGET_MONTH'):
+    ld = (dt_now.replace(day=1) - datetime.timedelta(days=1)).replace(day=1)
+    yyyy_mm = ld.strftime('%Y-%m')
+    while yyyy_mm >= '2006-01': # AWS started from 2006
+      print(yyyy_mm)
+      for index_name in index_names:
+        if not yyyy_mm in index_name:
+          continue
+        # check INCLUDE_LIST and EXCLUDE_LIST
+        if is_exclude(index_name):
+          print(index_name + ' is exluded.')
+          continue
+        if not is_include(index_name):
+          print(index_name + ' is not inluded.')
+          continue
+        delete(aos_client, index_name)
+      ld = (ld.replace(day=1) - datetime.timedelta(days=1)).replace(day=1)
+      yyyy_mm = ld.strftime('%Y-%m')
+
+
 def create_awsauth(aos_hostname):
   aos_region = aos_hostname.split('.')[1]
   credentials = boto3.Session().get_credentials()
@@ -93,7 +115,7 @@ def is_exclude(index_name):
   # EXCLUDE_LIST が設定されていなければ必ず除外しない判定 (False)
   if len(EXCLUDE_LIST) == 0:
     return False
-    
+
   for exclude_str in EXCLUDE_LIST:
     if exclude_str in index_name:
       return True
@@ -113,5 +135,13 @@ def delete_by_query(aos_client, index_name, yyyy_mm_dd):
         }
       }
     }
+  )
+  print(res) # DEBUG
+
+
+def delete(aos_client, index_name):
+  print('=== POST ' + index_name + '/_delete_by_query ===') # DEBUG
+  res = aos_client.delete_by_query(
+    index=index_name
   )
   print(res) # DEBUG
