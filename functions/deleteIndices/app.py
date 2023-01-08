@@ -7,8 +7,13 @@ from opensearchpy import AWSV4SignerAuth, OpenSearch, RequestsHttpConnection
 AOS_HOSTNAME = os.getenv('AOS_HOSTNAME')
 # Delete logs XX days old.
 DAYS = int(os.getenv('RETENTION_DAYS'))
-INCLUDE_LIST = [l.strip() for l in str(os.getenv('INCLUDE_LIST')).split(',')]
-EXCLUDE_LIST = [l.strip() for l in str(os.getenv('EXCLUDE_LIST')).split(',')]
+INCLUDE_LIST = []
+if os.getenv('INCLUDE_LIST'):
+  INCLUDE_LIST =[l.strip() for l in str(os.getenv('INCLUDE_LIST')).split(',')]
+EXCLUDE_LIST = []
+if os.getenv('EXCLUDE_LIST'):
+  [l.strip() for l in str(os.getenv('EXCLUDE_LIST')).split(',')]
+print(EXCLUDE_LIST)
 
 
 def handler(event, context):
