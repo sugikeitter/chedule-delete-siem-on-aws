@@ -45,9 +45,10 @@ def handler(event, context):
     index_name = i_list[2]
     if yyyy_mm in index_name:
       index_names.append(index_name)
-  # XX 日前の YYYY-MM-DD を抜き出して、log-aws-***-YYYY-MM を bulk で削除
   print('=== GET _cat/indices/ ===')
   print(index_names) # DEBUG
+
+  # XX 日前の YYYY-MM-DD を抜き出して、log-aws-***-YYYY-MM を bulk で削除
   for index_name in index_names:
     # check INCLUDE_LIST and EXCLUDE_LIST
     if is_exclude(index_name):
@@ -56,21 +57,7 @@ def handler(event, context):
     if not is_include(index_name):
       print(index_name + ' is not inluded.')
       continue
-
-    print('=== POST ' + index_name + '/_delete_by_query ===') # DEBUG
-    res = aos_client.delete_by_query(
-      index=index_name,
-      body={
-        "query": {
-          "range": {
-            "eventTime": {
-              "lte": yyyy_mm_dd + "T23:59:59Z"
-            }
-          }
-        }
-      }
-    )
-    print(res) # DEBUG
+    delete_by_query(aos_client, index_name, yyyy_mm_dd)
 
     
 def create_awsauth(aos_hostname):
@@ -111,3 +98,20 @@ def is_exclude(index_name):
     if exclude_str in index_name:
       return True
   return False
+
+
+def delete_by_query(aos_client, index_name, yyyy_mm_dd):
+  print('=== POST ' + index_name + '/_delete_by_query ===') # DEBUG
+  res = aos_client.delete_by_query(
+    index=index_name,
+    body={
+      "query": {
+        "range": {
+          "eventTime": {
+            "lte": yyyy_mm_dd + "T23:59:59Z"
+          }
+        }
+      }
+    }
+  )
+  print(res) # DEBUG
