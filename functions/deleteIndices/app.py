@@ -7,6 +7,8 @@ from opensearchpy import AWSV4SignerAuth, OpenSearch, RequestsHttpConnection
 AOS_HOSTNAME = os.getenv('AOS_HOSTNAME')
 # Delete logs XX days old.
 DAYS = int(os.getenv('RETENTION_DAYS'))
+INCLUDE_LIST = [l.strip() for l in str(os.getenv('INCLUDE_LIST')).split(',')]
+EXCLUDE_LIST = [l.strip() for l in str(os.getenv('EXCLUDE_LIST')).split(',')]
 
 
 def handler(event, context):
@@ -29,7 +31,7 @@ def handler(event, context):
   for i in indices.split("\n"):
     i_list = i.split()
     if len(i_list) <= 2:
-      break
+      continue
     index_name = i_list[2]
     if yyyy_mm in index_name:
       index_names.append(index_name)
@@ -37,6 +39,14 @@ def handler(event, context):
   print('=== GET _cat/indices/ ===')
   print(index_names) # DEBUG
   for index_name in index_names:
+    # INCLUDE_LIST 
+    if is_exclude(index_name):
+      print(index_name + ' is exluded.')
+      continue
+    if not is_include(index_name):
+      print(index_name + ' is not inluded.')
+      continue
+
     print('=== POST ' + index_name + '/_delete_by_query ===') # DEBUG
     res = aos_client.delete_by_query(
       index=index_name,
@@ -69,3 +79,25 @@ def create_aos_client(awsauth, aos_hostname):
     retry_on_timeout=True,
     connection_class=RequestsHttpConnection,
     timeout=60)
+
+
+def is_include(index_name):
+  # INCLUDE_LIST が設定されていなければ必ず含む判定 (True)
+  if len(INCLUDE_LIST) == 0:
+    return True
+
+  for include_str in INCLUDE_LIST:
+    if include_str in index_name:
+      return True
+  return False
+
+
+def is_exclude(index_name):
+  # EXCLUDE_LIST が設定されていなければ必ず除外しない判定 (False)
+  if len(EXCLUDE_LIST) == 0:
+    return False
+    
+  for exclude_str in EXCLUDE_LIST:
+    if exclude_str in index_name:
+      return True
+  return False

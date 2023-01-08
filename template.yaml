@@ -19,6 +19,8 @@ Resources:
         Variables:
           RETENTION_DAYS: 7 # You can change this setting
           AOS_HOSTNAME: <TARGET_HOSTNAME> # TODO Set your value
+          # INCLUDE_LIST: 'log-aws-waf'
+          # EXCLUDE_LIST: 'log-aws-cloudtrail, metrics-opensearch-index'
       Events:
         Schedule:
           Type: Schedule
