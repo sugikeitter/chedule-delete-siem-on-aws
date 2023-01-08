@@ -39,7 +39,7 @@ def handler(event, context):
   print('=== GET _cat/indices/ ===')
   print(index_names) # DEBUG
   for index_name in index_names:
-    # INCLUDE_LIST 
+    # check INCLUDE_LIST and EXCLUDE_LIST
     if is_exclude(index_name):
       print(index_name + ' is exluded.')
       continue
