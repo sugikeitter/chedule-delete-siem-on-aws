@@ -29,11 +29,11 @@ def handler(event, context):
   dt_now = datetime.datetime.now()
   print('Today: ' + dt_now.strftime('%Y-%m-%d'))
   print('Retention days: ' + str(RETENTION_DAYS))
-  dt_target = datetime.timedelta(days=RETENTION_DAYS + 1)
-  dt = dt_now - dt_target
-  yyyy_mm = dt.strftime('%Y-%m')
+  days = datetime.timedelta(days=RETENTION_DAYS + 1)
+  dt_target = dt_now - days
+  yyyy_mm = dt_target.strftime('%Y-%m')
   print('Delete target month: ' + yyyy_mm) # DEBUG
-  yyyy_mm_dd = dt.strftime('%Y-%m-%d')
+  yyyy_mm_dd = dt_target.strftime('%Y-%m-%d')
   print('Delete target day: ' + yyyy_mm_dd) # DEBUG
 
   # GET /_cat/indices で YYYY-MM が XX 日前のものを抜き出して index_names へ
@@ -44,14 +44,16 @@ def handler(event, context):
     i_list = i.split()
     if len(i_list) <= 2:
       continue
-    index_name = i_list[2]
-    if yyyy_mm in index_name:
-      index_names.append(index_name)
+    index_names.append(i_list[2])
+    # if yyyy_mm in index_name:
+    #   index_names.append(index_name)
   print('=== GET _cat/indices/ ===')
   print(index_names) # DEBUG
 
   # XX 日前の YYYY-MM-DD を抜き出して、log-aws-***-YYYY-MM を bulk で削除
   for index_name in index_names:
+    if not yyyy_mm in index_name:
+      continue
     # check INCLUDE_LIST and EXCLUDE_LIST
     if is_exclude(index_name):
       print(index_name + ' is exluded.')
@@ -140,8 +142,9 @@ def delete_by_query(aos_client, index_name, yyyy_mm_dd):
 
 
 def delete(aos_client, index_name):
-  print('=== POST ' + index_name + '/_delete_by_query ===') # DEBUG
-  res = aos_client.delete(
-    index=index_name
+  print('=== DELETE ' + index_name + ' ===') # DEBUG
+  # TODO 'no permissions for [indices:admin/delete]'
+  res = aos_client.indices.delete(
+    index='metrics-opensearch-index-2022-07'
   )
   print(res) # DEBUG
