@@ -63,7 +63,7 @@ def handler(event, context):
 
   # 削除対象の月より前の月のインデックスを削除したい場合
   if os.getenv('DELETE_BEFORE_TARGET_MONTH'):
-    ld = (dt_now.replace(day=1) - datetime.timedelta(days=1)).replace(day=1)
+    ld = (dt_target.replace(day=1) - datetime.timedelta(days=1)).replace(day=1)
     yyyy_mm = ld.strftime('%Y-%m')
     while yyyy_mm >= '2006-01': # AWS started from 2006
       print(yyyy_mm)
