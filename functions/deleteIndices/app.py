@@ -10,9 +10,12 @@ DAYS = int(os.getenv('RETENTION_DAYS'))
 INCLUDE_LIST = []
 if os.getenv('INCLUDE_LIST'):
   INCLUDE_LIST =[l.strip() for l in str(os.getenv('INCLUDE_LIST')).split(',')]
+print('INCLUDE_LIST')
+print(INCLUDE_LIST)
 EXCLUDE_LIST = []
 if os.getenv('EXCLUDE_LIST'):
   [l.strip() for l in str(os.getenv('EXCLUDE_LIST')).split(',')]
+print('EXCLUDE_LIST')
 print(EXCLUDE_LIST)
 
 
