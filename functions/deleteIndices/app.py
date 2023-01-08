@@ -79,7 +79,7 @@ def handler(event, context):
         if not is_include(index_name):
           print(index_name + ' is not inluded.')
           continue
-        delete(aos_client, index_name)
+        delete_by_query_match_all(aos_client, index_name)
       ld = (ld.replace(day=1) - datetime.timedelta(days=1)).replace(day=1)
       yyyy_mm = ld.strftime('%Y-%m')
 
@@ -141,10 +141,20 @@ def delete_by_query(aos_client, index_name, yyyy_mm_dd):
   print(res) # DEBUG
 
 
-def delete(aos_client, index_name):
-  print('=== DELETE ' + index_name + ' ===') # DEBUG
-  # TODO 'no permissions for [indices:admin/delete]'
-  res = aos_client.indices.delete(
-    index='metrics-opensearch-index-2022-07'
+def delete_by_query_match_all(aos_client, index_name):
+#  # TODO Delete index API を使用するには、OpenSearch 側の Security/Roles の設定で Permissions に 'indices:admin/delete' を追加しないと、
+#  # "AuthorizationException(403, 'security_exception', 'no permissions for [indices:admin/delete] ..." になってしまうので使用できない
+#  print('=== DELETE ' + index_name + ' ===') # DEBUG
+#  res = aos_client.indices.delete(
+#    index='log-aws-cloudtrail-2022-11'
+#  )
+  print('=== POST ' + index_name + '/_delete_by_query - match_all ===') # DEBUG
+  res = aos_client.delete_by_query(
+    index=index_name,
+    body={
+      "query": {
+        "match_all": {}
+      }
+    }
   )
   print(res) # DEBUG
