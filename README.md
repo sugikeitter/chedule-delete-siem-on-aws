@@ -1,4 +1,5 @@
 # schedule-delete-siem-on-aws
+Delete indices from https://github.com/aws-samples/siem-on-amazon-opensearch-service deployment.
 
 ## Setup
 
